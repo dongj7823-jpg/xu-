@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中秋快乐 · 月满人团圆</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Microsoft YaHei", sans-serif;
+    color: #fff;
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  /* 星空背景 */
+  canvas#stars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  /* 月亮 */
+  .moon {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle at 30% 30%, #fff, #ddd 70%);
+    border-radius: 50%;
+    box-shadow: 0 0 60px 15px #fff7b3;
+    animation: float 4s ease-in-out infinite;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  h1 {
+    margin-top: 1em;
+    font-size: 2.4em;
+    animation: fadeIn 3s ease-in-out;
+    z-index: 1;
+  }
+
+  p {
+    margin-top: 1em;
+    font-size: 1.2em;
+    animation: fadeIn 4s ease-in-out;
+    z-index: 1;
+    line-height: 1.6;
+  }
+
+  footer {
+    position: absolute;
+    bottom: 10px;
+    font-size: 0.9em;
+    opacity: 0.8;
+    z-index: 1;
+  }
+
+  /* 桂花 */
+  .petal {
+    position: absolute;
+    top: -50px;
+    background: radial-gradient(circle at center, #ffd27f 0%, #e0a300 90%);
+    border-radius: 50% 50% 50% 0;
+    opacity: 0.8;
+    animation: fall linear infinite;
+    z-index: 1;
+  }
+
+  @keyframes fall {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh) rotate(360deg);
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <div class="moon" id="moon"></div>
+  <h1>中秋快乐，小徐老师！🌕</h1>
+  <p>
+    愿明月常圆，桂花常开，岁岁平安。<br>
+    教学质量好到爆,奖金绩效全都要！
+    祝中秋节快乐！<br>
+  </p>
+  <footer>🌕 点击月亮放烟花 | 🎶 点击页面播放音乐</footer>
+
+  <audio id="bgm" loop>
+    <!-- 你可以替换成自己的本地音乐或网络mp3 -->
+    <source src="music.mp3" type="audio/mp3">
+  </audio>
+
+<script>
+/* 🌌 星空绘制 */
+const starsCanvas = document.getElementById('stars');
+const ctx = starsCanvas.getContext('2d');
+let stars = [];
+function resizeStars() {
+  starsCanvas.width = window.innerWidth;
+  starsCanvas.height = window.innerHeight;
+  stars = Array.from({ length: 200 }, () => ({
+    x: Math.random() * starsCanvas.width,
+    y: Math.random() * starsCanvas.height,
+    r: Math.random() * 1.2,
+    o: Math.random() * 0.8 + 0.2
+  }));
+}
+function drawStars() {
+  ctx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+  ctx.fillStyle = "#fff";
+  stars.forEach(s => {
+    ctx.globalAlpha = s.o;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+resizeStars();
+setInterval(drawStars, 50);
+window.addEventListener("resize", resizeStars);
+
+/* 🌼 桂花雨 */
+const numPetals = 25;
+for (let i = 0; i < numPetals; i++) {
+  const petal = document.createElement("div");
+  petal.classList.add("petal");
+  const size = Math.random() * 10 + 8;
+  petal.style.width = `${size}px`;
+  petal.style.height = `${size}px`;
+  petal.style.left = `${Math.random() * 100}vw`;
+  petal.style.animationDuration = `${Math.random() * 8 + 8}s`;
+  petal.style.animationDelay = `${Math.random() * 5}s`;
+  document.body.appendChild(petal);
+}
+
+/* 🎆 点击月亮放烟花 */
+const moon = document.getElementById("moon");
+moon.addEventListener("click", (e) => {
+  createFirework(window.innerWidth / 2, window.innerHeight / 2);
+});
+
+function createFirework(x, y) {
+  const canvas = document.createElement("canvas");
+  document.body.appendChild(canvas);
+  canvas.style.position = "fixed";
+  canvas.style.left = "0";
+  canvas.style.top = "0";
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const c = canvas.getContext("2d");
+  const particles = [];
+  const colors = ["#ffcc00", "#ff9966", "#ff6666", "#ffff66", "#ccff66"];
+  for (let i = 0; i < 80; i++) {
+    particles.push({
+      x: x,
+      y: y,
+      angle: Math.random() * 2 * Math.PI,
+      speed: Math.random() * 5 + 2,
+      radius: Math.random() * 3 + 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1
+    });
+  }
+  const animate = () => {
+    c.fillStyle = "rgba(0,0,0,0.2)";
+    c.fillRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += Math.cos(p.angle) * p.speed;
+      p.y += Math.sin(p.angle) * p.speed + 0.3;
+      p.alpha -= 0.01;
+      c.globalAlpha = p.alpha;
+      c.fillStyle = p.color;
+      c.beginPath();
+      c.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+      c.fill();
+    });
+    if (particles.some(p => p.alpha > 0)) {
+      requestAnimationFrame(animate);
+    } else {
+      document.body.removeChild(canvas);
+    }
+  };
+  animate();
+}
+
+/* 🎵 点击任意位置播放音乐（浏览器限制自动播放） */
+document.body.addEventListener("click", () => {
+  document.getElementById("bgm").play();
+});
+</script>
+</body>
+</html>
